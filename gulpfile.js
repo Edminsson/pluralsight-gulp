@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var args = require('yargs').argv;
 var config = require('./gulp.config')();
 var del = require('del');
+var wiredep = require('wiredep').stream;
 
 var $ = require('gulp-load-plugins')({rename: {'gulp-jscs-stylish': 'stylish'}});
 
@@ -39,8 +40,17 @@ gulp.task('clean-styles', function() {
 });
 
 gulp.task('less-watcher', function() {
-    gulp.watch(config.less, ['styles'])
-})
+    gulp.watch(config.less, ['styles']);
+});
+
+gulp.task('wiredep', function() {
+    var options = config.getWiredepDefaultOptions();
+    gulp
+    .src(config.index)
+    .pipe(wiredep(options))
+    .pipe($.inject(gulp.src(config.js)))
+    .pipe(gulp.dest(config.client));
+});
 
 ////////////////
 function log(msg) {
